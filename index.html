@@ -4,9 +4,79 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Demo Landing</title>
+
+  <style>
+    body { font-family: Arial, sans-serif; padding: 30px; }
+    .card { max-width: 600px; border: 1px solid #ddd; padding: 20px; border-radius: 10px; }
+    label { display:block; margin-top: 12px; }
+    input, button { width: 100%; padding: 8px; margin-top: 4px; }
+    button { margin-top: 16px; }
+    .hidden { display: none; }
+  </style>
 </head>
 <body>
-  <h1>Hola</h1>
-  <p>Esto es mi landing en GitHub Pages.</p>
+
+<div class="card">
+
+  <!-- Pantalla 1 -->
+  <section id="step1">
+    <h2>Pantalla 1 – Datos previos</h2>
+
+    <form id="preForm">
+      <label>Email</label>
+      <input name="email" type="email" required>
+
+      <label>Nombre</label>
+      <input name="firstName" type="text" required>
+
+      <label>Apellido</label>
+      <input name="lastName" type="text" required>
+
+      <button type="submit">Continuar</button>
+    </form>
+  </section>
+
+  <!-- Pantalla 2 -->
+  <section id="step2" class="hidden">
+    <h2>Pantalla 2 – Collection Point</h2>
+
+    <div id="webform-container">
+      Aquí irá el formulario de OneTrust
+    </div>
+
+    <button id="backBtn" type="button">Volver</button>
+  </section>
+
+</div>
+
+<script>
+  const step1 = document.getElementById("step1");
+  const step2 = document.getElementById("step2");
+  const preForm = document.getElementById("preForm");
+  const backBtn = document.getElementById("backBtn");
+
+  function showStep(n) {
+    step1.classList.toggle("hidden", n !== 1);
+    step2.classList.toggle("hidden", n !== 2);
+  }
+
+  preForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const email = preForm.email.value;
+    const firstName = preForm.firstName.value;
+    const lastName = preForm.lastName.value;
+
+    console.log("Datos capturados:", email, firstName, lastName);
+
+    showStep(2);
+  });
+
+  backBtn.addEventListener("click", function() {
+    showStep(1);
+  });
+</script>
+
 </body>
 </html>
+
