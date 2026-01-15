@@ -10,10 +10,26 @@
     .card { max-width: 600px; border: 1px solid #ddd; padding: 20px; border-radius: 10px; }
     label { display:block; margin-top: 12px; }
     input, button { width: 100%; padding: 8px; margin-top: 4px; }
-    button { margin-top: 16px; }
+    button { margin-top: 16px; cursor: pointer; }
     .hidden { display: none; }
+    #webform-container { margin-top: 16px; }
   </style>
+
+  <!-- 1) Command queue de OtSdk (para que no falle si llamamos antes de que cargue el SDK) -->
+  <script>
+    window.OtSdk = window.OtSdk || function () {
+      (window.OtSdk.q = window.OtSdk.q || []).push(arguments);
+    };
+  </script>
+
+  <!-- 2) Script de OneTrust (tal cual lo has pasado) -->
+  <script
+    src="https://privacyportaltrial.onetrust.com/consent-embedded-forms/consent-receipt-scripts/OtFormStub.js"
+    data-id="86cfa775-f542-42b6-8f6d-30a22fc81ba1"
+    worker="https://consent-api.onetrust.com"
+  ></script>
 </head>
+
 <body>
 
 <div class="card">
@@ -40,9 +56,7 @@
   <section id="step2" class="hidden">
     <h2>Pantalla 2 – Collection Point</h2>
 
-    <div id="webform-container">
-      Aquí irá el formulario de OneTrust
-    </div>
+    <div id="webform-container"></div>
 
     <button id="backBtn" type="button">Volver</button>
   </section>
@@ -50,6 +64,8 @@
 </div>
 
 <script>
+  const CP_ID = "86cfa775-f542-42b6-8f6d-30a22fc81ba1";
+
   const step1 = document.getElementById("step1");
   const step2 = document.getElementById("step2");
   const preForm = document.getElementById("preForm");
@@ -58,6 +74,17 @@
   function showStep(n) {
     step1.classList.toggle("hidden", n !== 1);
     step2.classList.toggle("hidden", n !== 2);
+  }
+
+  function installCollectionPoint() {
+    try {
+      // Manual load
+      OneTrust.webform.InstallCP(CP_ID, function(success){
+        console.log("InstallCP callback:", success);
+      });
+    } catch (e) {
+      console.error("InstallCP error:", e);
+    }
   }
 
   preForm.addEventListener("submit", function(e) {
@@ -70,13 +97,26 @@
     console.log("Datos capturados:", email, firstName, lastName);
 
     showStep(2);
+
+    // Cargar el CP al entrar en la pantalla 2
+    installCollectionPoint();
   });
 
   backBtn.addEventListener("click", function() {
     showStep(1);
   });
+
+  // Eventos (para debug)
+  window.addEventListener("OnetrustFormLoaded", (event) => {
+    console.log("OnetrustFormLoaded:", event.detail);
+  });
+
+  window.addEventListener("OneTrustWebFormSubmitted", (event) => {
+    console.log("OneTrustWebFormSubmitted:", event.detail);
+  });
 </script>
 
 </body>
 </html>
+
 
